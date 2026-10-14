@@ -71,15 +71,15 @@ impl Term {
         let mut result = HashSet::new();
         match self {
             Term::Var(symb) => {
-                result.insert(symb.to_string());
+                result.insert(symb.to_string());        // -> {v}
             }
             Term::Lambda(param, body) => {
-                result.insert(param.to_string());
-                result.extend(body.all_variables());
+                result.insert(param.to_string());       // -> {param}
+                result.extend(body.all_variables());    // U (all_variables body)
             }
             Term::Application(f, t) => {
-                result.extend(f.all_variables());
-                result.extend(t.all_variables());
+                result.extend(f.all_variables());       // -> (all_variables f)
+                result.extend(t.all_variables());       // U (all_variables p)
             }
         }
         return result;
@@ -127,8 +127,31 @@ impl Term {
     }
 
     /// Performs normal-order reduction.
+    /// Inputs: t, a term
+    /// Outputs: the term in weak head normal form.
     pub fn normal_order_reduction(&self) -> Term {
-        todo!("Implement this.") // TODO
+        let mut result = HashSet::new();
+
+        match self {
+            Term::Var(symb) => {
+                result.insert(self);
+            }
+            Term::Lambda(param, body) => {
+                result.insert(self);
+            }
+            Term::Application(f, p) => {
+                match f.normal_order_reduction {
+                    Term::Lambda(param, body) {
+                        body.perform_substitution(param, p);
+                    } // Lambda(param, body) -> n_o_r (substitute body param p)
+                    g {
+                        result.insert(Term::Application(g, p))
+                    }// g -> Application(g, p)
+                }
+            }
+        }
+
+        return result;
     }
 }
 
@@ -289,6 +312,20 @@ mod tests {
 
     #[test]
     fn test_normal_order_reduction() {
-        todo!("Write this test!"); // TODO
+        // x => x
+        let var = Term::Var("x".tostring());
+        let result = lambda.normal_order_reduction();
+        assert_eq!(format!("{}", result), "x");
+        // λx.x => λx.x
+        let lambda = Term::Lambda("x".to_string(), Box::new(Term::Var("x".to_string())));
+        let result = lambda.normal_order_reduction();
+        assert_eq!(format!("{}", result), "λx.x");
+        // λx.x y => y
+        let app = Term::Application(
+            Box::new(Term::Lambda("x".to_string(), Box::new(Term::Var("x".to_string())))),
+            Box::new(Term::Var("y".to_string())),
+        );
+        let result = app.normal_order_reduction();
+        assert_eq!(format!("{}", result), "y");
     }
 }
