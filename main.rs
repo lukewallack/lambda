@@ -60,7 +60,7 @@ fn application_parser(input: &str) -> Option<(Term, &str)> {
             ),
         ),
     );
-    if let Some(((_par_open, (term1, (term2, _par_closed))), rest)) = p(input) {
+    if let Some(((_p_open, (term1, (term2, _p_closed))), rest)) = p(input) {
         Some((Term::Application(Box::new(term1), Box::new(term2)), rest))
     } else {
         None
@@ -92,3 +92,8 @@ fn main() {
         line.clear();
     }
 }
+
+/// (λx.(x.x) λx.(x.x)) - How do we handle this?
+/// I understand that I am not supposed to try to 
+/// reduce it, but I don't know how to check when 
+/// this case occurs and prevent reduction.

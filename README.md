@@ -4,7 +4,7 @@
 - parse.rs/or
 - term.rs/normal_order_reduction
 - main.rs/application_parser
-- test suite
+- tests
 
 ## Parsers and combinators notes
 A parser is a program that transforms an input string into a resulting syntax tree, and the unparsed 
