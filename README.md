@@ -1,3 +1,5 @@
+# README
+- Used 3 late days, turned in Wednesday night.
 
 # PERSONAL NOTES, IGNORE BELOW
 ## Deliverables
