@@ -311,6 +311,14 @@ mod tests {
         let var = Term::Var("x".to_string());
         let result = var.normal_order_reduction();
         assert_eq!(format!("{}", result), "x");
+        // (x y) => (x y)
+        let app = Term::Application(
+            Box::new(Term::Var("x".to_string())),
+            Box::new(Term::Var("y".to_string())),
+        );
+        let result = app.normal_order_reduction();
+        assert_eq!(format!("{}", result), "(x y)");
+
         // λx.x => λx.x
         let lambda = Term::Lambda("x".to_string(), Box::new(Term::Var("x".to_string())));
         let result = lambda.normal_order_reduction();
@@ -329,5 +337,13 @@ mod tests {
         );
         let result = app.normal_order_reduction();
         assert_eq!(format!("{}", result), "λx.x");
+
+        // λx.(λy.y x) => λx.(λy.y x)
+        let lambda = Term::Lambda("x".to_string(), Box::new(Term::Application(
+                Box::new(Term::Lambda("y".to_string(), Box::new(Term::Var("y".to_string())))),
+                Box::new(Term::Var("x".to_string())),
+            )));
+        let result = lambda.normal_order_reduction();
+        assert_eq!(format!("{}", result), "λx.(λy.y x)");
     }
 }

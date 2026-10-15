@@ -93,7 +93,7 @@ fn main() {
     }
 }
 
-/// (λx.(x.x) λx.(x.x)) - How do we handle this?
-/// I understand that I am not supposed to try to 
-/// reduce it, but I don't know how to check when 
-/// this case occurs and prevent reduction.
+// (λx.(x.x) λx.(x.x)) - How do we handle this?
+// I understand that I am not supposed to try to 
+// reduce it, but I don't know how to check when 
+// this case occurs and prevent reduction.
