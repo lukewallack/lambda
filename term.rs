@@ -127,31 +127,26 @@ impl Term {
     }
 
     /// Performs normal-order reduction.
-    /// Inputs: t, a term
-    /// Outputs: the term in weak head normal form.
+    /// Output the term in weak head normal form.
     pub fn normal_order_reduction(&self) -> Term {
-        let mut result = HashSet::new();
-
         match self {
-            Term::Var(symb) => {
-                result.insert(self);
+            Term::Var(_symb) => {
+                self.clone()
             }
-            Term::Lambda(param, body) => {
-                result.insert(self);
+            Term::Lambda(_param, _body) => {
+                self.clone()
             }
             Term::Application(f, p) => {
-                match f.normal_order_reduction {
-                    Term::Lambda(param, body) {
-                        body.perform_substitution(param, p);
+                match f.normal_order_reduction() {
+                    Term::Lambda(param, body) => {
+                        (body.perform_substitution(&param, p)).normal_order_reduction()
                     } // Lambda(param, body) -> n_o_r (substitute body param p)
-                    g {
-                        result.insert(Term::Application(g, p))
+                    g => {
+                        Term::Application(Box::new(g), p.clone())
                     }// g -> Application(g, p)
                 }
             }
         }
-
-        return result;
     }
 }
 
@@ -313,8 +308,8 @@ mod tests {
     #[test]
     fn test_normal_order_reduction() {
         // x => x
-        let var = Term::Var("x".tostring());
-        let result = lambda.normal_order_reduction();
+        let var = Term::Var("x".to_string());
+        let result = var.normal_order_reduction();
         assert_eq!(format!("{}", result), "x");
         // λx.x => λx.x
         let lambda = Term::Lambda("x".to_string(), Box::new(Term::Var("x".to_string())));
@@ -327,5 +322,12 @@ mod tests {
         );
         let result = app.normal_order_reduction();
         assert_eq!(format!("{}", result), "y");
+        // λx.x λx.x => λx.x
+        let app = Term::Application(
+            Box::new(Term::Lambda("x".to_string(), Box::new(Term::Var("x".to_string())))),
+            Box::new(Term::Lambda("x".to_string(), Box::new(Term::Var("x".to_string())))),
+        );
+        let result = app.normal_order_reduction();
+        assert_eq!(format!("{}", result), "λx.x");
     }
 }
